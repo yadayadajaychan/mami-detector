@@ -8,7 +8,7 @@ camera = cv2.VideoCapture(0)
 
 context = zmq.Context()
 socket = context.socket(zmq.PUB)
-socket.bind("tcp://127.0.0.1:5556")
+socket.bind("tcp://*:5556")
 
 while True:
     success, frame = camera.read()
