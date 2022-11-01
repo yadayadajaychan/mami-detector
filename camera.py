@@ -2,6 +2,7 @@
 
 import cv2
 import zmq
+import pickle
 
 camera = cv2.VideoCapture(0)
 
@@ -12,7 +13,6 @@ socket.bind("tcp://127.0.0.1:5556")
 while True:
     success, frame = camera.read()
     if success:
-        retval, buffer = cv2.imencode(".jpg", frame)
-        socket.send(buffer.tobytes())
+        socket.send(pickle.dumps(frame))
 
 camera.release()
