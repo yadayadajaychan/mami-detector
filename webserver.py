@@ -1,18 +1,24 @@
 #!/usr/bin/env python3
 
 from flask import Flask, render_template, Response
+import os
 import cv2
 import time
 import zmq
 import pickle
 from concurrent.futures import ThreadPoolExecutor
+from dotenv import load_dotenv
+
+load_dotenv()
+PREDICTION_AND_IMAGE_ADDRESS = os.getenv("PREDICTION_AND_IMAGE_ADDRESS")
+PREDICTION_AND_IMAGE_PORT = os.getenv("PREDICTION_AND_IMAGE_PORT")
 
 app = Flask("__name__")
 
 context = zmq.Context()
 socket = context.socket(zmq.SUB)
 
-socket.connect("tcp://localhost:5557")
+socket.connect(f"tcp://{PREDICTION_AND_IMAGE_ADDRESS}:{PREDICTION_AND_IMAGE_PORT}")
 socket.setsockopt(zmq.SUBSCRIBE, b"")
 
 def get_frame():
