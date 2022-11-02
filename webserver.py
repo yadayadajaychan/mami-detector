@@ -12,7 +12,7 @@ app = Flask("__name__")
 context = zmq.Context()
 socket = context.socket(zmq.SUB)
 
-socket.connect("tcp://localhost:5556")
+socket.connect("tcp://localhost:5557")
 socket.setsockopt(zmq.SUBSCRIBE, b"")
 
 def get_frame():
