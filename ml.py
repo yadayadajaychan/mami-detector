@@ -9,18 +9,14 @@ from keras.models import load_model
 # create zmq context
 context = zmq.Context()
 # socket for receiving frames
-frame_socket = context.socket(zmq.SUB)
+frame_socket = context.socket(zmq.REQ)
 frame_socket.connect("tcp://localhost:5556")
-frame_socket.setsockopt(zmq.SUBSCRIBE, b"")
 # socket for publishing predictions + img
 prediction_socket = context.socket(zmq.PUB)
 prediction_socket.bind("tcp://*:5557")
 
 # Load the model
 model = load_model('keras_model.h5')
-
-# CAMERA can be 0 or 1 based on default camera of your computer.
-camera = cv2.VideoCapture(0)
 
 # Grab the labels from the labels.txt file. This will be used later.
 labels = open('labels.txt', 'r').readlines()
@@ -36,10 +32,8 @@ def crop_square(img):
     return img[:, start_width:end_width]
 
 while True:
-    # Grab the webcameras image.
-    #ret, image = camera.read()
-
     # grab numpy array from socket
+    frame_socket.send(b"GET")
     frame = pickle.loads(frame_socket.recv())
     # crop image into square
     frame = crop_square(frame)
@@ -64,5 +58,4 @@ while True:
     if keyboard_input == 27:
         break
 
-camera.release()
 cv2.destroyAllWindows()
