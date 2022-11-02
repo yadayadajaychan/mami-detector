@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 
+import os
 import cv2
 import zmq
 import pickle
+from dotenv import load_dotenv
+
+load_dotenv()
+CAMERA_PORT = os.getenv("CAMERA_PORT")
 
 camera = cv2.VideoCapture(0)
 
 context = zmq.Context()
 socket = context.socket(zmq.REP)
-socket.bind("tcp://*:5556")
+socket.bind(f"tcp://*:{CAMERA_PORT}")
 
 # assuming image is wider than height
 def crop_square(img):

@@ -1,16 +1,22 @@
 #!/usr/bin/env python3
 
+import os
 import cv2
 import numpy as np
 import zmq
 import pickle
 from keras.models import load_model
+from dotenv import load_dotenv
+
+load_dotenv() # load env variables from .env file
+CAMERA_ADDRESS = os.getenv("CAMERA_ADDRESS")
+CAMERA_PORT = os.getenv("CAMERA_PORT")
 
 # create zmq context
 context = zmq.Context()
 # socket for receiving frames
 frame_socket = context.socket(zmq.REQ)
-frame_socket.connect("tcp://192.168.1.91:5556")
+frame_socket.connect(f"tcp://{CAMERA_ADDRESS}:{CAMERA_PORT}")
 # socket for publishing predictions + img
 prediction_socket = context.socket(zmq.PUB)
 prediction_socket.bind("tcp://*:5557")
