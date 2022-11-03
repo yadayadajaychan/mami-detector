@@ -23,8 +23,11 @@ socket.setsockopt(zmq.SUBSCRIBE, b"")
 
 def get_frame():
     while True:
-        frame = pickle.loads(socket.recv())
-        ret, image = cv2.imencode(".jpg", frame)
+        pred_and_img = pickle.loads(socket.recv())
+        pred = pred_and_img[0].split("\n")
+        img = cv2.putText(pred_and_img[1], pred[0], (10,20), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 1, cv2.LINE_AA)
+        img = cv2.putText(img, pred[1], (10,40), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 1, cv2.LINE_AA)
+        ret, image = cv2.imencode(".jpg", img)
 
         yield(b'--frame\r\n'
               b'Content-Type: image/jpeg\r\n\r\n' + image.tobytes() + b'\r\n')

@@ -44,7 +44,8 @@ while True:
     # returns an array of percentages. Example:[0.2,0.8] meaning its 20% sure
     # it is the first label and 80% sure its the second label.
     probabilities = model.predict(image)
-    #print(probabilities[0])
-    print("land rover    : %6.2f%%" % (probabilities[0][0] * 100))
-    print("not land rover: %6.2f%%" % (probabilities[0][1] * 100))
-    prediction_and_image_socket.send(pickle.dumps(frame))
+    readable_probabilities = "land rover    : %6.2f%%\nnot land rover: %6.2f%%"\
+                % ((probabilities[0][0] * 100), (probabilities[0][1] * 100))
+    print(readable_probabilities)
+    pred_and_img = (readable_probabilities, frame)
+    prediction_and_image_socket.send(pickle.dumps(pred_and_img))
