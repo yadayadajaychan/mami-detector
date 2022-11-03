@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import time
 import cv2
 import numpy as np
 import zmq
@@ -37,7 +38,7 @@ while True:
     frame_socket.send(b"GET")
     frame = pickle.loads(frame_socket.recv())
     # Make the image a numpy array and reshape it to the models input shape.
-    image = np.asarray(frame, dtype=np.float32).reshape(1, 224, 224, 3)
+    image = np.asarray(frame[0], dtype=np.float32).reshape(1, 224, 224, 3)
     # Normalize the image array
     image = (image / 127.5) - 1
     # Have the model predict what the current image is. Model.predict
@@ -47,5 +48,5 @@ while True:
     readable_probabilities = "land rover    : %6.2f%%\nnot land rover: %6.2f%%"\
                 % ((probabilities[0][0] * 100), (probabilities[0][1] * 100))
     print(readable_probabilities)
-    pred_and_img = (readable_probabilities, frame)
+    pred_and_img = (readable_probabilities, frame[0], frame[1])
     prediction_and_image_socket.send(pickle.dumps(pred_and_img))

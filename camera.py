@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+from time import localtime
 import cv2
 import zmq
 import pickle
@@ -29,12 +30,13 @@ def crop_square(img):
 while True:
     success, frame = camera.read()
     if success:
+        timestamp = localtime()
         #crop image into square
         frame = crop_square(frame)
         # Resize the raw image into (224-height,224-width) pixels.
         frame = cv2.resize(frame, (224, 224), interpolation=cv2.INTER_AREA)
 
-        pickled_frame = pickle.dumps(frame)
+        pickled_frame = pickle.dumps((frame, timestamp))
 
         # wait for request from client
         message = socket.recv()

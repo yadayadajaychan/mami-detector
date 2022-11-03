@@ -2,6 +2,7 @@
 
 from flask import Flask, render_template, Response
 import os
+from time import strftime
 import cv2
 import time
 import zmq
@@ -25,8 +26,10 @@ def get_frame():
     while True:
         pred_and_img = pickle.loads(socket.recv())
         pred = pred_and_img[0].split("\n")
+        timestamp = strftime("%Y-%m-%dT%H:%M:%S%z", pred_and_img[2])
         img = cv2.putText(pred_and_img[1], pred[0], (10,20), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 1, cv2.LINE_AA)
         img = cv2.putText(img, pred[1], (10,40), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 1, cv2.LINE_AA)
+        img = cv2.putText(img, timestamp, (10,214), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 1, cv2.LINE_AA)
         ret, image = cv2.imencode(".jpg", img)
 
         yield(b'--frame\r\n'
