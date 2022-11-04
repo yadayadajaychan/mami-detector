@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 
+import os
 import zmq
 from dotenv import load_dotenv
 
 load_dotenv()
+PREDICTION_ADDRESS = os.getenv("PREDICTION_ADDRESS")
+PREDICTION_PORT = os.getenv("PREDICTION_PORT")
+
 context = zmq.Context()
 prediction_socket = context.socket(zmq.SUB)
 prediction_socket.connect(f"tcp://{PREDICTION_ADDRESS}:{PREDICTION_PORT}")
