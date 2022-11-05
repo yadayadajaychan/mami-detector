@@ -24,11 +24,13 @@ socket.setsockopt(zmq.SUBSCRIBE, b"")
 
 def get_frame():
     while True:
-        pred_and_img = pickle.loads(socket.recv())
-        pred = pred_and_img[0].split("\n")
-        timestamp = strftime("%Y-%m-%dT%H:%M:%S%z", pred_and_img[2])
-        img = cv2.putText(pred_and_img[1], pred[0], (10,20), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 1, cv2.LINE_AA)
-        img = cv2.putText(img, pred[1], (10,40), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 1, cv2.LINE_AA)
+        pred, frame, timestamp = pickle.loads(socket.recv())
+        readable_pred = ("land rover    : %6.2f%%" % (pred[0] * 100),
+                         "not land rover: %6.2f%%" % (pred[1] * 100))
+        timestamp = strftime("%Y-%m-%dT%H:%M:%S%z", timestamp)
+
+        img = cv2.putText(frame, readable_pred[0], (10,20), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 1, cv2.LINE_AA)
+        img = cv2.putText(img, readable_pred[1], (10,40), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 1, cv2.LINE_AA)
         img = cv2.putText(img, timestamp, (8,220), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 1, cv2.LINE_AA)
         ret, image = cv2.imencode(".jpg", img)
 

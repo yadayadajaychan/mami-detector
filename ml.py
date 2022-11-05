@@ -34,19 +34,20 @@ model = load_model('keras_model.h5')
 labels = open('labels.txt', 'r').readlines()
 
 while True:
+    start = time.time()
     # grab numpy array from socket
     frame_socket.send(b"GET")
-    frame = pickle.loads(frame_socket.recv())
+    frame, timestamp = pickle.loads(frame_socket.recv())
     # Make the image a numpy array and reshape it to the models input shape.
-    image = np.asarray(frame[0], dtype=np.float32).reshape(1, 224, 224, 3)
+    image = np.asarray(frame, dtype=np.float32).reshape(1, 224, 224, 3)
     # Normalize the image array
     image = (image / 127.5) - 1
     # Have the model predict what the current image is. Model.predict
     # returns an array of percentages. Example:[0.2,0.8] meaning its 20% sure
     # it is the first label and 80% sure its the second label.
-    probabilities = model.predict(image)
-    readable_probabilities = "land rover    : %6.2f%%\nnot land rover: %6.2f%%"\
-                % ((probabilities[0][0] * 100), (probabilities[0][1] * 100))
-    print(readable_probabilities)
-    pred_and_img = (readable_probabilities, frame[0], frame[1])
-    prediction_and_image_socket.send(pickle.dumps(pred_and_img))
+    probabilities = tuple(model.predict(image)[0])
+    print(probabilities)
+    prediction_socket.send(pickle.dumps((probabilities, timestamp)))
+    prediction_and_image_socket.send(pickle.dumps((probabilities, frame, timestamp)))
+    end = time.time()
+    print(str(1/(end - start)) + " fps")
