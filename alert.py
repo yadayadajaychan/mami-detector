@@ -2,6 +2,7 @@
 
 import os
 import zmq
+import pickle
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -11,6 +12,7 @@ PREDICTION_PORT = os.getenv("PREDICTION_PORT")
 context = zmq.Context()
 prediction_socket = context.socket(zmq.SUB)
 prediction_socket.connect(f"tcp://{PREDICTION_ADDRESS}:{PREDICTION_PORT}")
+prediction_socket.setsockopt(zmq.SUBSCRIBE, b"")
 
 ## +===============+====================================+============+=========+
 ## | current state |               input                | next state | output  |
@@ -28,7 +30,8 @@ while True:
     # armed
     count = 0
     while True:
-        pred = prediction_socket.recv()
+        pred, timestamp = pickle.loads(prediction_socket.recv())
+        print(pred)
         if pred[0] > 0.75:
             count += 1
             if count >= 5:
@@ -42,7 +45,8 @@ while True:
     # unarmed
     count = 0
     while True:
-        pred = prediction_socket.recv()
+        pred, timestamp = pickle.loads(prediction_socket.recv())
+        print(pred)
         if pred[1] > 0.85:
             count += 1
             if count >= 30:
