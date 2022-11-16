@@ -4,3 +4,4 @@ pyzmq
 tensorflow
 keras
 python-dotenv
+requests

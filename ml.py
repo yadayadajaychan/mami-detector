@@ -7,6 +7,10 @@ import numpy as np
 import zmq
 import pickle
 from keras.models import load_model
+
+import tensorflow
+tensorflow.compat.v1.disable_eager_execution()
+
 from dotenv import load_dotenv
 
 load_dotenv() # load env variables from .env file
