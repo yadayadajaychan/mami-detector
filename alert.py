@@ -58,23 +58,6 @@ if USE_DISCORD_WEBHOOK:
 ## +---------------+------------------------------------+------------+---------+
 
 while True:
-    # armed
-    count = 0
-    while True:
-        pred, timestamp = pickle.loads(prediction_socket.recv())
-        print(pred)
-        if pred[0] > 0.75:
-            count += 1
-            if count >= 20:
-                break
-        elif count > 0:
-            count = 0
-
-    # 4 beeps
-    print("4 beeps")
-    if USE_DISCORD_WEBHOOK:
-        send_discord("land rover detected", timestamp, color = "red")
-
     # unarmed
     count = 0
     while True:
@@ -91,3 +74,20 @@ while True:
     print("1 beep")
     if USE_DISCORD_WEBHOOK:
         send_discord("land rover left", timestamp, color = "green")
+
+    # armed
+    count = 0
+    while True:
+        pred, timestamp = pickle.loads(prediction_socket.recv())
+        print(pred)
+        if pred[0] > 0.75:
+            count += 1
+            if count >= 20:
+                break
+        elif count > 0:
+            count = 0
+
+    # 4 beeps
+    print("4 beeps")
+    if USE_DISCORD_WEBHOOK:
+        send_discord("land rover detected", timestamp, color = "red")
