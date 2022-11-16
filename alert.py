@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os
+import os, sys
 import zmq
 import pickle
 from dotenv import load_dotenv
@@ -13,6 +13,38 @@ context = zmq.Context()
 prediction_socket = context.socket(zmq.SUB)
 prediction_socket.connect(f"tcp://{PREDICTION_ADDRESS}:{PREDICTION_PORT}")
 prediction_socket.setsockopt(zmq.SUBSCRIBE, b"")
+
+USE_DISCORD_WEBHOOK = os.getenv("USE_DISCORD_WEBHOOK")
+DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
+
+if USE_DISCORD_WEBHOOK == "True":
+    USE_DISCORD_WEBHOOK = True
+    import requests
+elif USE_DISCORD_WEBHOOK == "False":
+    USE_DISCORD_WEBHOOK = False
+else:
+    sys.exit("Invalid boolean for 'USE_DISCORD_WEBHOOK'")
+
+def send_discord(message, timestamp = None, frame = None, color = "red"):
+    #data = {'content':message,}
+    colors = {"red": 16711680, "green": 65280, "blue": 255}
+    color = "blue"
+    payload = {
+            "content": message,
+            "embeds": [
+                {
+                    "title": "this is a title",
+                    "description": "this is a description",
+                    "color": colors[color],
+                },
+            ],
+        }
+    requests.post(url = DISCORD_WEBHOOK_URL, json = payload)
+
+
+
+if USE_DISCORD_WEBHOOK:
+    send_discord("test")
 
 ## +===============+====================================+============+=========+
 ## | current state |               input                | next state | output  |
