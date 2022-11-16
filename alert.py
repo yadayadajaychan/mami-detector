@@ -48,11 +48,11 @@ if USE_DISCORD_WEBHOOK:
 ## +===============+====================================+============+=========+
 ## | current state |               input                | next state | output  |
 ## +===============+====================================+============+=========+
-## | armed         | >=75% land rover for 5 frames      | unarmed    | 4 beeps |
+## | armed         | >=75% land rover for 20 frames     | unarmed    | 4 beeps |
 ## +---------------+------------------------------------+------------+---------+
 ## | armed         | <75% land rover                    | armed      | none    |
 ## +---------------+------------------------------------+------------+---------+
-## | unarmed       | >=85% not land rover for 30 frames | armed      | 1 beep  |
+## | unarmed       | >=85% not land rover for 80 frames | armed      | 1 beep  |
 ## +---------------+------------------------------------+------------+---------+
 ## | unarmed       | <85% not land rover                | unarmed    | none    |
 ## +---------------+------------------------------------+------------+---------+
@@ -65,7 +65,7 @@ while True:
         print(pred)
         if pred[0] > 0.75:
             count += 1
-            if count >= 5:
+            if count >= 20:
                 break
         elif count > 0:
             count = 0
@@ -82,7 +82,7 @@ while True:
         print(pred)
         if pred[1] > 0.85:
             count += 1
-            if count >= 30:
+            if count >= 80:
                 break
         elif count > 0:
             count = 0
