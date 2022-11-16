@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os, sys
+import os, sys, time
 import zmq
 import pickle
 from dotenv import load_dotenv
@@ -25,16 +25,15 @@ elif USE_DISCORD_WEBHOOK == "False":
 else:
     sys.exit("Invalid boolean for 'USE_DISCORD_WEBHOOK'")
 
-def send_discord(message, timestamp = None, frame = None, color = "red"):
-    #data = {'content':message,}
+def send_discord(message, timestamp = None, frame = None, color = "blue"):
     colors = {"red": 16711680, "green": 65280, "blue": 255}
-    color = "blue"
     payload = {
-            "content": message,
+            #"content": message,
             "embeds": [
                 {
-                    "title": "this is a title",
-                    "description": "this is a description",
+                    "title": message,
+                    #"description": "this is a description",
+                    "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z", timestamp),
                     "color": colors[color],
                 },
             ],
@@ -44,7 +43,7 @@ def send_discord(message, timestamp = None, frame = None, color = "red"):
 
 
 if USE_DISCORD_WEBHOOK:
-    send_discord("test")
+    send_discord("Alert system started.", time.localtime())
 
 ## +===============+====================================+============+=========+
 ## | current state |               input                | next state | output  |
@@ -73,6 +72,8 @@ while True:
 
     # 4 beeps
     print("4 beeps")
+    if USE_DISCORD_WEBHOOK:
+        send_discord("land rover detected", timestamp, color = "red")
 
     # unarmed
     count = 0
@@ -88,3 +89,5 @@ while True:
 
     # 1 beep
     print("1 beep")
+    if USE_DISCORD_WEBHOOK:
+        send_discord("land rover left", timestamp, color = "green")
