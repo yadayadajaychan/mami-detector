@@ -93,7 +93,7 @@ while True:
 
         if pred[1] > 0.85:
             count += 1
-            if count >= 80:
+            if count >= 1:
                 break
         elif count > 0:
             count = 0
@@ -117,7 +117,7 @@ while True:
 
         if pred[0] > 0.75:
             count += 1
-            if count >= 20:
+            if count >= 1:
                 break
         elif count > 0:
             count = 0
