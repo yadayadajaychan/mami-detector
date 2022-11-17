@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os, sys, time
+import os, sys, time, random
 import zmq
 import pickle
 from dotenv import load_dotenv
@@ -103,6 +103,9 @@ while True:
     if USE_DISCORD_WEBHOOK:
         if USE_IMAGE:
             send_discord("land rover left", timestamp, frame, "green")
+            cv2.imwrite(time.strftime("%Y-%m-%dT%H:%M:%S%z", timestamp) +
+                        '_(' + str(random.randrange(1,100,1)) + ').png',
+                        frame)
         else:
             send_discord("land rover left", timestamp, color = "green")
 
@@ -127,5 +130,8 @@ while True:
     if USE_DISCORD_WEBHOOK:
         if USE_IMAGE:
             send_discord("land rover detected", timestamp, frame, "red")
+            cv2.imwrite(time.strftime("%Y-%m-%dT%H:%M:%S%z", timestamp) +
+                        '_(' + str(random.randrange(1,100,1)) + ').png',
+                        frame)
         else:
             send_discord("land rover detected", timestamp, color = "red")
