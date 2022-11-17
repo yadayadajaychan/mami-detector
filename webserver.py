@@ -24,7 +24,7 @@ socket.setsockopt(zmq.SUBSCRIBE, b"")
 
 def get_frame():
     while True:
-        pred, frame, timestamp = pickle.loads(socket.recv())
+        pred, timestamp, frame = pickle.loads(socket.recv())
         readable_pred = ("land rover    : %6.2f%%" % (pred[0] * 100),
                          "not land rover: %6.2f%%" % (pred[1] * 100))
         timestamp = strftime("%Y-%m-%dT%H:%M:%S%z", timestamp)

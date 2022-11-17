@@ -52,6 +52,6 @@ while True:
     probabilities = tuple(model.predict(image)[0])
     print(probabilities)
     prediction_socket.send(pickle.dumps((probabilities, timestamp)))
-    prediction_and_image_socket.send(pickle.dumps((probabilities, frame, timestamp)))
+    prediction_and_image_socket.send(pickle.dumps((probabilities, timestamp, frame)))
     end = time.time()
     print(str(1/(end - start)) + " fps")
