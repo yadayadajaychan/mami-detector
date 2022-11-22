@@ -58,16 +58,21 @@ def send_discord(message, timestamp = None, frame = None, color = "blue"):
                 },
             ],
         }
-    requests.post(url = DISCORD_WEBHOOK_URL, json = payload)
+    r = requests.post(url = DISCORD_WEBHOOK_URL, json = payload)
+    r.raise_for_status()
 
     if frame is not None:
         ret, image = cv2.imencode('.png', frame)
         file = {f"{iso8601_timestamp}.png": image.tobytes()}
-        requests.post(url = DISCORD_WEBHOOK_URL, files=file)
+        r = requests.post(url = DISCORD_WEBHOOK_URL, files=file)
+        r.raise_for_status()
 
 
 if USE_DISCORD_WEBHOOK:
-    send_discord("Alert system started.", time.localtime())
+    try:
+        send_discord("Alert system started.", time.localtime())
+    except Exception as e:
+        sys.exit(e)
 
 ## +===============+====================================+============+=========+
 ## | current state |               input                | next state | output  |
@@ -102,12 +107,19 @@ while True:
     print("1 beep")
     if USE_DISCORD_WEBHOOK:
         if USE_IMAGE:
-            send_discord("land rover left", timestamp, frame, "green")
+            try:
+                send_discord("land rover left", timestamp, frame, "green")
+            except Exception as e:
+                sys.stderr.write("failed to send to discord\n" + str(e) + '\n')
+
             cv2.imwrite(time.strftime("%Y-%m-%dT%H:%M:%S%z", timestamp) +
                         '_(' + str(random.randrange(1,100,1)) + ').png',
                         frame)
         else:
-            send_discord("land rover left", timestamp, color = "green")
+            try:
+                send_discord("land rover left", timestamp, color = "green")
+            except Exception as e:
+                sys.stderr.write("failed to send to discord\n" + str(e) + '\n')
 
     # armed
     count = 0
@@ -129,9 +141,16 @@ while True:
     print("4 beeps")
     if USE_DISCORD_WEBHOOK:
         if USE_IMAGE:
-            send_discord("land rover detected", timestamp, frame, "red")
+            try:
+                send_discord("land rover detected", timestamp, frame, "red")
+            except Exception as e:
+                sys.stderr.write("failed to send to discord\n" + str(e) + '\n')
+
             cv2.imwrite(time.strftime("%Y-%m-%dT%H:%M:%S%z", timestamp) +
                         '_(' + str(random.randrange(1,100,1)) + ').png',
                         frame)
         else:
-            send_discord("land rover detected", timestamp, color = "red")
+            try:
+                send_discord("land rover detected", timestamp, color = "red")
+            except Exception as e:
+                sys.stderr.write("failed to send to discord\n" + str(e) + '\n')
