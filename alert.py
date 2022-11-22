@@ -7,9 +7,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+ARMED_THRESHOLD = int(os.getenv("ARMED_THRESHOLD"))
+UNARMED_THRESHOLD = int(os.getenv("UNARMED_THRESHOLD"))
+
 USE_DISCORD_WEBHOOK = os.getenv("USE_DISCORD_WEBHOOK")
 DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
-
 if USE_DISCORD_WEBHOOK.lower() == "true":
     USE_DISCORD_WEBHOOK = True
     import requests
@@ -20,22 +22,31 @@ else:
 
 
 USE_IMAGE = os.getenv("USE_IMAGE")
-
 if USE_IMAGE.lower() == "true":
     USE_IMAGE = True
     import cv2
-
     prediction_address = os.getenv("PREDICTION_AND_IMAGE_ADDRESS")
     prediction_port = os.getenv("PREDICTION_AND_IMAGE_PORT")
-
 elif USE_IMAGE.lower() == "false":
     USE_IMAGE = False
-
     prediction_address = os.getenv("PREDICTION_ADDRESS")
     prediction_port = os.getenv("PREDICTION_PORT")
-
 else:
     sys.exit("Invalid boolean for 'USE_IMAGE'")
+
+
+SAVE_IMAGE = os.getenv("SAVE_IMAGE")
+if SAVE_IMAGE.lower() == "true":
+    if USE_IMAGE:
+        SAVE_IMAGE = True
+    else:
+        sys.exit("'USE_IMAGE' must be set to true in order to set "
+                 + "'SAVE_IMAGE' to true")
+elif SAVE_IMAGE.lower() == "false":
+    SAVE_IMAGE = False
+else:
+    sys.exit("Invalid boolean for 'SAVE_IMAGE'")
+
 
 context = zmq.Context()
 prediction_socket = context.socket(zmq.SUB)
@@ -98,7 +109,7 @@ while True:
 
         if pred[1] > 0.85:
             count += 1
-            if count >= 1:
+            if count >= UNARMED_THRESHOLD:
                 break
         elif count > 0:
             count = 0
@@ -112,14 +123,15 @@ while True:
             except Exception as e:
                 sys.stderr.write("failed to send to discord\n" + str(e) + '\n')
 
-            cv2.imwrite(time.strftime("%Y-%m-%dT%H:%M:%S%z", timestamp) +
-                        '_(' + str(random.randrange(1,100,1)) + ').png',
-                        frame)
         else:
             try:
                 send_discord("land rover left", timestamp, color = "green")
             except Exception as e:
                 sys.stderr.write("failed to send to discord\n" + str(e) + '\n')
+
+    if SAVE_IMAGE:
+        cv2.imwrite(time.strftime("%Y-%m-%dT%H:%M:%S%z", timestamp) +
+                '_(' + str(random.randrange(1,100,1)) + ').png', frame)
 
     # armed
     count = 0
@@ -132,7 +144,7 @@ while True:
 
         if pred[0] > 0.75:
             count += 1
-            if count >= 1:
+            if count >= ARMED_THRESHOLD:
                 break
         elif count > 0:
             count = 0
@@ -146,11 +158,12 @@ while True:
             except Exception as e:
                 sys.stderr.write("failed to send to discord\n" + str(e) + '\n')
 
-            cv2.imwrite(time.strftime("%Y-%m-%dT%H:%M:%S%z", timestamp) +
-                        '_(' + str(random.randrange(1,100,1)) + ').png',
-                        frame)
         else:
             try:
                 send_discord("land rover detected", timestamp, color = "red")
             except Exception as e:
                 sys.stderr.write("failed to send to discord\n" + str(e) + '\n')
+
+    if SAVE_IMAGE:
+        cv2.imwrite(time.strftime("%Y-%m-%dT%H:%M:%S%z", timestamp) +
+                '_(' + str(random.randrange(1,100,1)) + ').png', frame)
